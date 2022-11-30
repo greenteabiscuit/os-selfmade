@@ -1,4 +1,4 @@
-kfunc
+; naskfunc
 ; TAB=4
 
 ;[FORMAT "WOOFF"]							; オブジェクトファイルを作るモード
@@ -18,7 +18,6 @@ section .text
 GLOBAL main.io_hlt
 
 main.io_hlt:	; void io_hlt(void);
-		mov rax,0
 		RET
 
 

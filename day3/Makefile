@@ -10,8 +10,8 @@ asmhead.bin : asmhead.asm
 nasmfunc.o : nasmfunc.asm 
 	nasm -g -f elf nasmfunc.asm -o nasmfunc.o -l nasmfunc.lst
 
-bootpack.hrb : bootpack.c os.lds nasmfunc.o 
-	gcc -march=i486 -m32 -fno-pic -nostdlib -T os.lds nasmfunc.o bootpack.c -o bootpack.hrb
+bootpack.hrb : main.go os.lds nasmfunc.o 
+	gccgo -fsplit-stack -static -g -march=i486 -m32 -fno-pic -nostdlib -T os.lds nasmfunc.o main.go -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb 
 	cat asmhead.bin bootpack.hrb > haribote.sys
