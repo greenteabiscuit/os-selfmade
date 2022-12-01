@@ -13,11 +13,10 @@
 ; 以下は実際の関数
 
 ;[SECTION .text] 							; オブジェクトファイルではこれを書いてからプログラムを書く
-section .data
+
 section .text
-GLOBAL main.io_hlt
+		GLOBAL _io_hlt
 
-main.io_hlt:	; void io_hlt(void);
+_io_hlt:	; void io_hlt(void);
+		HLT
 		RET
-
-
