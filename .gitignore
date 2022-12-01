@@ -1,0 +1,7 @@
+*.bin
+*.lst
+*.o
+.vagrant
+*.hrb
+*.img
+*.sys
