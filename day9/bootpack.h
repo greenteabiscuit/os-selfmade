@@ -23,6 +23,8 @@ extern void load_idtr(int limit, int addr);
 extern void asm_inthandler21(void);
 extern void asm_inthandler27(void);
 extern void asm_inthandler2c(void);
+extern int load_cr0(void);
+extern void store_cr0(int register);
 
 /* fifo.c */
 struct FIFO8 {

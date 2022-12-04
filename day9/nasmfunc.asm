@@ -8,6 +8,7 @@ section .text
 		GLOBAL io_load_eflags, io_store_eflags
 		GLOBAL load_gdtr, load_idtr
 		GLOBAL asm_inthandler21, asm_inthandler27, asm_inthandler2c
+		GLOBAL load_cr0, store_cr0
 		EXTERN inthandler21, inthandler27, inthandler2c
 
 
@@ -62,6 +63,15 @@ io_out32:
 		MOV			EDX,[ESP+4]
 		MOV			EAX,[ESP+8]
 		OUT			DX,EAX
+		RET
+
+load_cr0:
+		MOV			EAX,CR0
+		RET
+
+store_cr0:
+		MOV			EAX,[ESP+4]
+		MOV			CR0, EAX
 		RET
 
 io_load_eflags:
