@@ -17,6 +17,11 @@ func main() {
 	buf := []byte{'H', 'e', 'l', 'l', 'o', ' ', 'G', 'o', 'l', 'a', 'n', 'g', 'U', 'K', '!'}
 	attr := uint16(2<<4 | 0) // black text; green bg
 	for i, b := range buf {
+		// 1st byte is color, second is letter
+		/*
+			|  green	|    H		|
+			| 00100000	| 01001000	|
+		*/
 		*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(i*2))) = attr<<8 | uint16(b)
 	}
 
@@ -32,7 +37,7 @@ func main() {
 
 	scr := make([]uint16, 2000)
 	for i := 0; i < 2000; i++ {
-		scr[i] = 0xb737
+		scr[i] = attr<<8 | 0
 	}
 
 	copy(fb, scr)
