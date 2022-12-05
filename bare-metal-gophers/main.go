@@ -15,7 +15,7 @@ func main() {
 	// Display a string to the top-left corner of the screen one character
 	// at a time.
 	buf := []byte{'H', 'e', 'l', 'l', 'o', ' ', 'G', 'o', 'l', 'a', 'n', 'g', 'U', 'K', '!'}
-	attr := uint16(2<<4 | 0) // black text; green bg
+	attr := uint16(2<<6 | 0) // black text; green bg
 	for i, b := range buf {
 		// 1st byte is color, second is letter
 		/*
@@ -39,6 +39,7 @@ func main() {
 	for i := 0; i < 2000; i++ {
 		scr[i] = attr<<8 | 0
 	}
+	boxFill(scr, 0x001000, 80, 0, 0, 20, 20)
 
 	copy(fb, scr)
 
@@ -62,6 +63,14 @@ func main() {
 		)
 
 	*/
+}
+
+func boxFill(scr []uint16, color uint16, xsize, x0, y0, x1, y1 uint16) {
+	for y := y0; y < y1; y++ {
+		for x := x0; x < x1; x++ {
+			scr[y*xsize+x] = color
+		}
+	}
 }
 
 // transition implements a slide transition using the current contents of the
