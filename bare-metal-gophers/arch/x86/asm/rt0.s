@@ -51,6 +51,7 @@ _rt0_entry:
 	cmp eax, MULTIBOOT_MAGIC
 	jne unsupported_bootloader
 
+
 	; Initalize our stack by pointing ESP to the BSS-allocated stack. In x86,
 	; stack grows downwards so we need to point ESP to stack_top
 	mov esp, stack_top
@@ -91,19 +92,19 @@ unsupported_bootloader:
 ; physical address is 0xa0000.
 ;------------------------------------------------------------------------------
 write_string:
+    MOV		AL,0x13			; VGAグラフィックス、320x200x8bitカラー
+    MOV		AH,0x00
+    INT		0x10
+    MOV		BYTE [VMODE],8	; 画面モードをメモする（C言語が参照する）
+    MOV		WORD [SCRNX],320
+    MOV		WORD [SCRNY],200
+    MOV		DWORD [VRAM],0x000a0000
 
-	mov al, 0x13
-	mov ah, 0x00
-	int 0x10
+    ; キーボードのLED状態をBIOSに教えてもらう
 
-	mov byte [VMODE], 8
-	mov word [SCRNX], 320
-	mov word [SCRNY], 200
-	MOV dword [VRAM], 0x000a0000
-
-	MOV ah, 0x02
-	int 0x16
-	mov [LEDS],AL
+    MOV		AH,0x02
+    INT		0x16 			; keyboard BIOS
+    MOV		[LEDS],AL
 
 done:
 	pop ebx

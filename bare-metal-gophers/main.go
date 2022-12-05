@@ -36,17 +36,7 @@ func main() {
 	// that is designed so that no variables escape to the heap. This is
 	// important as any calls to the runtime memory allocator will cause
 	// the machine to triple-fault.
-	/*
-		bareMetalGophers(
-			fb, // render target
-			float64(fbWidth), float64(fbHeight),
-			vec3{0, 5, 7.5}, // eye
-			vec3{0, 0, 0},   // look-at
-			vec3{0, 1, 0},   // camera up
-			0.03,            // tick step
-		)
 
-	*/
 }
 
 func boxFill(scr []uint16, color uint16, xsize, x0, y0, x1, y1 uint16) {
