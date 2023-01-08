@@ -25,6 +25,12 @@ G_STACK_LO equ 0x0
 G_STACK_HI equ 0x4
 G_STACKGUARD0 equ 0x8
 
+LEDS EQU 0x0ff1
+VMODE equ 0x0ff2
+SCRNX equ 0x0ff4
+SCRNY equ 0x0ff6
+VRAM equ 0x0ff8
+
 err_unsupported_bootloader db '[rt0] kernel not loaded by multiboot-compliant bootloader', 0
 
 ;------------------------------------------------------------------------------
@@ -44,6 +50,7 @@ global _rt0_entry
 _rt0_entry:
 	cmp eax, MULTIBOOT_MAGIC
 	jne unsupported_bootloader
+
 
 	; Initalize our stack by pointing ESP to the BSS-allocated stack. In x86,
 	; stack grows downwards so we need to point ESP to stack_top
@@ -85,20 +92,19 @@ unsupported_bootloader:
 ; physical address is 0xa0000.
 ;------------------------------------------------------------------------------
 write_string:
-	push eax
-	push ebx
+    MOV		AL,0x13			; VGAグラフィックス、320x200x8bitカラー
+    MOV		AH,0x00
+    INT		0x10
+    MOV		BYTE [VMODE],8	; 画面モードをメモする（C言語が参照する）
+    MOV		WORD [SCRNX],320
+    MOV		WORD [SCRNY],200
+    MOV		DWORD [VRAM],0x000a0000
 
-	mov ebx,0xa0000
-	mov ah, 0x4F
-next_char:
-	mov al, byte[edi]
-	test al, al
-	jz done
+    ; キーボードのLED状態をBIOSに教えてもらう
 
-	mov word [ebx], ax
-	add ebx, 2
-	inc edi
-	jmp next_char
+    MOV		AH,0x02
+    INT		0x16 			; keyboard BIOS
+    MOV		[LEDS],AL
 
 done:
 	pop ebx

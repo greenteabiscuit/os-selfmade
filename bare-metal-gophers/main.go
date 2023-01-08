@@ -1,47 +1,31 @@
 package main
 
 import (
-	"reflect"
 	"unsafe"
 )
 
 const (
 	fbWidth            = 80
 	fbHeight           = 25
-	fbPhysAddr uintptr = 0xb8000
+	fbPhysAddr uintptr = 0xa0000
 )
 
 func main() {
+	delay(1000)
 	// Display a string to the top-left corner of the screen one character
 	// at a time.
-	buf := []byte{'H', 'e', 'l', 'l', 'o', ' ', 'G', 'o', 'l', 'a', 'n', 'g', 'U', 'K', '!'}
-	attr := uint16(2<<6 | 0) // black text; green bg
-	for i, b := range buf {
+	for i := 0; i < 0xffff; i++ {
 		// 1st byte is color, second is letter
 		/*
 			|  green	|    H		|
 			| 00100000	| 01001000	|
 		*/
-		*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(i*2))) = attr<<8 | uint16(b)
+		var x uint16
+		x = uint16(i)
+		*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(x))) = 15
 	}
 
-	delay(1000)
-
-	// To setup our framebuffer slice we setup a fake reflect.SliceHeader that
-	// points to the physical memory address of the mapped VGA text buffer
-	var fb = *(*[]uint16)(unsafe.Pointer(&reflect.SliceHeader{
-		Len:  fbWidth * fbHeight,
-		Cap:  fbWidth * fbHeight,
-		Data: fbPhysAddr,
-	}))
-
-	scr := make([]uint16, 2000)
-	for i := 0; i < 2000; i++ {
-		scr[i] = attr<<8 | 0
-	}
-	boxFill(scr, 0x001000, 80, 0, 0, 20, 20)
-
-	copy(fb, scr)
+	delay(10000)
 
 	// Since both fb and logo are slices we can use the built-in copy funtion
 	// to draw our logo.
@@ -52,17 +36,7 @@ func main() {
 	// that is designed so that no variables escape to the heap. This is
 	// important as any calls to the runtime memory allocator will cause
 	// the machine to triple-fault.
-	/*
-		bareMetalGophers(
-			fb, // render target
-			float64(fbWidth), float64(fbHeight),
-			vec3{0, 5, 7.5}, // eye
-			vec3{0, 0, 0},   // look-at
-			vec3{0, 1, 0},   // camera up
-			0.03,            // tick step
-		)
 
-	*/
 }
 
 func boxFill(scr []uint16, color uint16, xsize, x0, y0, x1, y1 uint16) {

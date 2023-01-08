@@ -20,12 +20,12 @@ header_start:
 	align 8 ; tags should be 64-bit aligned
 
 	; Define graphics mode tag 
-	;dw 5    ; type
-	;dw 0    ; flags
-	;dd 20   ; size 
-	;dd 80   ; width (pixels or chars)
-	;dd 25   ; height (pixels or chars)
-	;dd 0    ; bpp (0 for text mode 
+	dw 5    ; type
+	dw 0    ; flags
+	dd 20   ; size
+	dd 320   ; width (pixels or chars)
+	dd 200   ; height (pixels or chars)
+	dd 8    ; depth,  bpp (0 for text mode
 	
 	align 8 ; tags should be 64-bit aligned
 
