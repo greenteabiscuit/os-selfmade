@@ -32,6 +32,18 @@ func main() {
 	boxFill8(xsize, 0, ysize-27, xsize-1, ysize-27, COL8_FFFFFF)
 	boxFill8(xsize, 0, ysize-26, xsize-1, ysize-1, COL8_C6C6C6)
 
+	boxFill8(xsize, 3, ysize-24, 59, ysize-24, COL8_FFFFFF)
+	boxFill8(xsize, 2, ysize-24, 2, ysize-4, COL8_FFFFFF)
+	boxFill8(xsize, 3, ysize-4, 59, ysize-4, COL8_848484)
+	boxFill8(xsize, 59, ysize-23, 59, ysize-5, COL8_848484)
+	boxFill8(xsize, 2, ysize-3, 59, ysize-3, COL8_000000)
+	boxFill8(xsize, 60, ysize-24, 60, ysize-3, COL8_000000)
+
+	boxFill8(xsize, xsize-47, ysize-24, xsize-4, ysize-24, COL8_848484)
+	boxFill8(xsize, xsize-47, ysize-23, xsize-47, ysize-4, COL8_848484)
+	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, COL8_FFFFFF)
+	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, COL8_FFFFFF)
+
 	delay(10000)
 }
 
