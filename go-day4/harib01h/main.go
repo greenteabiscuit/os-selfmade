@@ -28,28 +28,28 @@ func main() {
 	delay(1000)
 	xsize, ysize := 320, 200
 	boxFill8(xsize, 0, 0, xsize-1, ysize-29, LIGHTBLUE)
-	boxFill8(xsize, 0, ysize-28, xsize-1, ysize-28, DARKGRAY)
-	boxFill8(xsize, 0, ysize-27, xsize-1, ysize-27, LIGHTGRAY)
-	boxFill8(xsize, 0, ysize-26, xsize-1, ysize-1, DARKGRAY)
+	boxFill8(xsize, 0, ysize-28, xsize-1, ysize-28, LIGHTGRAY)
+	boxFill8(xsize, 0, ysize-27, xsize-1, ysize-27, WHITE)
+	boxFill8(xsize, 0, ysize-26, xsize-1, ysize-1, LIGHTGRAY)
 
-	boxFill8(xsize, 3, ysize-24, 59, ysize-24, LIGHTGRAY)
-	boxFill8(xsize, 2, ysize-24, 2, ysize-4, LIGHTGRAY)
-	boxFill8(xsize, 3, ysize-4, 59, ysize-4, WHITE)
-	boxFill8(xsize, 59, ysize-23, 59, ysize-5, WHITE)
+	boxFill8(xsize, 3, ysize-24, 59, ysize-24, WHITE)
+	boxFill8(xsize, 2, ysize-24, 2, ysize-4, WHITE)
+	boxFill8(xsize, 3, ysize-4, 59, ysize-4, DARKGRAY)
+	boxFill8(xsize, 59, ysize-23, 59, ysize-5, DARKGRAY)
 	boxFill8(xsize, 2, ysize-3, 59, ysize-3, BLACK)
 	boxFill8(xsize, 60, ysize-24, 60, ysize-3, BLACK)
 
-	boxFill8(xsize, xsize-47, ysize-24, xsize-4, ysize-24, WHITE)
-	boxFill8(xsize, xsize-47, ysize-23, xsize-47, ysize-4, WHITE)
-	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, LIGHTGRAY)
-	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, LIGHTGRAY)
+	boxFill8(xsize, xsize-47, ysize-24, xsize-4, ysize-24, DARKGRAY)
+	boxFill8(xsize, xsize-47, ysize-23, xsize-47, ysize-4, DARKGRAY)
+	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, WHITE)
+	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, WHITE)
 
 	delay(10000)
 }
 
 func boxFill8(xsize, x0, y0, x1, y1 int, color uint16) {
-	for y := y0; y < y1; y++ {
-		for x := x0; x < x1; x++ {
+	for y := y0; y <= y1; y++ {
+		for x := x0; x <= x1; x++ {
 			*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(y*xsize) + uintptr(x))) = color
 		}
 	}
