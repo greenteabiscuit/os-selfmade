@@ -6,43 +6,43 @@ import (
 
 const (
 	fbPhysAddr  uintptr = 0xa0000
-	COL8_000000 uint16  = 0 // black
-	COL8_FF0000 uint16  = 1 // blue
-	COL8_00FF00 uint16  = 2 // green
+	BLACK       uint16  = 0
+	BLUE        uint16  = 1
+	GREEN       uint16  = 2
 	COL8_FFFF00 uint16  = 3
 	COL8_0000FF uint16  = 4
 	COL8_FF00FF uint16  = 5
 	COL8_00FFFF uint16  = 6
-	COL8_FFFFFF uint16  = 7
-	COL8_C6C6C6 uint16  = 8
+	LIGHTGRAY   uint16  = 7
+	DARKGRAY    uint16  = 8
 	COL8_840000 uint16  = 9
 	COL8_008400 uint16  = 10
-	LIGHTBLUE   uint16  = 11 // light blue
-	COL8_000084 uint16  = 12
-	COL8_840084 uint16  = 13
-	YELLOW      uint16  = 14 // yellow
-	WHITE       uint16  = 15 // white
+	LIGHTBLUE   uint16  = 11
+	RED         uint16  = 12
+	PINK        uint16  = 13
+	YELLOW      uint16  = 14
+	WHITE       uint16  = 15
 )
 
 func main() {
 	delay(1000)
 	xsize, ysize := 320, 200
 	boxFill8(xsize, 0, 0, xsize-1, ysize-29, LIGHTBLUE)
-	boxFill8(xsize, 0, ysize-28, xsize-1, ysize-28, COL8_C6C6C6)
-	boxFill8(xsize, 0, ysize-27, xsize-1, ysize-27, COL8_FFFFFF)
-	boxFill8(xsize, 0, ysize-26, xsize-1, ysize-1, COL8_FFFF00)
+	boxFill8(xsize, 0, ysize-28, xsize-1, ysize-28, DARKGRAY)
+	boxFill8(xsize, 0, ysize-27, xsize-1, ysize-27, LIGHTGRAY)
+	boxFill8(xsize, 0, ysize-26, xsize-1, ysize-1, DARKGRAY)
 
-	boxFill8(xsize, 3, ysize-24, 59, ysize-24, COL8_FFFFFF)
-	boxFill8(xsize, 2, ysize-24, 2, ysize-4, COL8_FFFFFF)
+	boxFill8(xsize, 3, ysize-24, 59, ysize-24, LIGHTGRAY)
+	boxFill8(xsize, 2, ysize-24, 2, ysize-4, LIGHTGRAY)
 	boxFill8(xsize, 3, ysize-4, 59, ysize-4, WHITE)
 	boxFill8(xsize, 59, ysize-23, 59, ysize-5, WHITE)
-	boxFill8(xsize, 2, ysize-3, 59, ysize-3, COL8_000000)
-	boxFill8(xsize, 60, ysize-24, 60, ysize-3, COL8_000000)
+	boxFill8(xsize, 2, ysize-3, 59, ysize-3, BLACK)
+	boxFill8(xsize, 60, ysize-24, 60, ysize-3, BLACK)
 
 	boxFill8(xsize, xsize-47, ysize-24, xsize-4, ysize-24, WHITE)
 	boxFill8(xsize, xsize-47, ysize-23, xsize-47, ysize-4, WHITE)
-	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, COL8_FFFFFF)
-	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, COL8_FFFFFF)
+	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, LIGHTGRAY)
+	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, LIGHTGRAY)
 
 	delay(10000)
 }
