@@ -10,14 +10,18 @@ const (
 
 func main() {
 	delay(1000)
-	for i := 0; i < 0xffff; i++ {
-		var x uint16
-		x = uint16(i)
-		// white screen
-		*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(x))) = 15
-	}
+	boxFill8(320, 20, 20, 120, 120, 15)
+	boxFill8(320, 70, 50, 170, 150, 14)
 
 	delay(10000)
+}
+
+func boxFill8(xsize, x0, y0, x1, y1 int, color uint16) {
+	for y := y0; y < y1; y++ {
+		for x := x0; x < x1; x++ {
+			*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(y*xsize) + uintptr(x))) = color
+		}
+	}
 }
 
 // delay implements a simple loop-based delay. The outer loop value is selected

@@ -4,4 +4,4 @@
 .vagrant
 *.hrb
 *.img
-*.sys
+*.sys.idea
