@@ -44,10 +44,78 @@ func main() {
 	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, WHITE)
 	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, WHITE)
 
-	putfont8Asc(xsize, 11, 11, WHITE, []byte("Golang OS"))
-	putfont8Asc(xsize, 10, 10, BLACK, []byte("Golang OS"))
+	variable := "Golang OS 1"
+
+	putfont8Asc(xsize, 11, 11, WHITE, []byte(variable))
+	putfont8Asc(xsize, 10, 10, BLACK, []byte(variable))
+
+	putfont8Asc(xsize, 10, 31, WHITE, []byte("scrnx = "))
+	putfont8Asc(xsize, 10, 30, BLACK, []byte("scrnx = "))
+	bs := convertIntToByteArray(xsize)
+	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
+	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
+
+	mouse := [256]uint16{}
+	cursor := "**************.." +
+		"*OOOOOOOOOOO*..." +
+		"*OOOOOOOOOO*...." +
+		"*OOOOOOOOO*....." +
+		"*OOOOOOOO*......" +
+		"*OOOOOOO*......." +
+		"*OOOOOOO*......." +
+		"*OOOOOOOO*......" +
+		"*OOOO**OOO*....." +
+		"*OOO*..*OOO*...." +
+		"*OO*....*OOO*..." +
+		"*O*......*OOO*.." +
+		"**........*OOO*." +
+		"*..........*OOO*" +
+		"............*OO*" +
+		".............***"
+	for y := 0; y < 16; y++ {
+		for x := 0; x < 16; x++ {
+			if cursor[y*16+x] == '*' {
+				mouse[y*16+x] = BLACK
+			}
+			if cursor[y*16+x] == 'O' {
+				mouse[y*16+x] = WHITE
+			}
+			if cursor[y*16+x] == '.' {
+				mouse[y*16+x] = LIGHTBLUE
+			}
+		}
+	}
+
+	putBlock8_8(xsize, 16, 16, 100, 100, 16, mouse[:])
 
 	delay(10000)
+}
+
+func putBlock8_8(vxsize, pxsize, pysize, px0, py0, bxsize int, buf []uint16) {
+	for y := 0; y < pysize; y++ {
+		for x := 0; x < pxsize; x++ {
+			*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(py0+y)*uintptr(vxsize) + uintptr(px0+x))) = buf[y*bxsize+x]
+		}
+	}
+}
+
+// can only show til 10 digits for now.
+func convertIntToByteArray(n int) [10]byte {
+	t := n
+	count := 0
+	for n > 0 {
+		n = n / 10
+		count++
+	}
+	bs := [10]byte{}
+
+	i := count - 1
+	for t > 0 {
+		bs[i] = byte(t%10 + 48)
+		t = t / 10
+		i--
+	}
+	return bs
 }
 
 func putfont8Asc(xsize, x, y int, color uint16, s []byte) {
