@@ -44,10 +44,36 @@ func main() {
 	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, WHITE)
 	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, WHITE)
 
-	putfont8Asc(xsize, 11, 11, WHITE, []byte("Golang OS"))
-	putfont8Asc(xsize, 10, 10, BLACK, []byte("Golang OS"))
+	variable := "Golang OS 1"
 
+	putfont8Asc(xsize, 11, 11, WHITE, []byte(variable))
+	putfont8Asc(xsize, 10, 10, BLACK, []byte(variable))
+
+	putfont8Asc(xsize, 10, 31, WHITE, []byte("scrnx = "))
+	putfont8Asc(xsize, 10, 30, BLACK, []byte("scrnx = "))
+	bs := convertIntToByteArray(xsize)
+	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
+	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
 	delay(10000)
+}
+
+// can only show til 10 digits for now.
+func convertIntToByteArray(n int) [10]byte {
+	t := n
+	count := 0
+	for n > 0 {
+		n = n / 10
+		count++
+	}
+	bs := [10]byte{}
+
+	i := count - 1
+	for t > 0 {
+		bs[i] = byte(t%10 + 48)
+		t = t / 10
+		i--
+	}
+	return bs
 }
 
 func putfont8Asc(xsize, x, y int, color uint16, s []byte) {
