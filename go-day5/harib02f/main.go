@@ -55,8 +55,38 @@ func main() {
 	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
 	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
 
-	mouse := InitMouseCursor8(LIGHTBLUE)
-	putBlock8_8(320, 16, 16, 100, 100, 16, mouse[:])
+	mouse := [256]uint16{}
+	cursor := "**************.." +
+		"*OOOOOOOOOOO*..." +
+		"*OOOOOOOOOO*...." +
+		"*OOOOOOOOO*....." +
+		"*OOOOOOOO*......" +
+		"*OOOOOOO*......." +
+		"*OOOOOOO*......." +
+		"*OOOOOOOO*......" +
+		"*OOOO**OOO*....." +
+		"*OOO*..*OOO*...." +
+		"*OO*....*OOO*..." +
+		"*O*......*OOO*.." +
+		"**........*OOO*." +
+		"*..........*OOO*" +
+		"............*OO*" +
+		".............***"
+	for y := 0; y < 16; y++ {
+		for x := 0; x < 16; x++ {
+			if cursor[y*16+x] == '*' {
+				mouse[y*16+x] = BLACK
+			}
+			if cursor[y*16+x] == 'O' {
+				mouse[y*16+x] = WHITE
+			}
+			if cursor[y*16+x] == '.' {
+				mouse[y*16+x] = LIGHTBLUE
+			}
+		}
+	}
+
+	// putBlock8_8(320, 16, 16, 100, 100, 16, mouse[:])
 
 	delay(10000)
 }
