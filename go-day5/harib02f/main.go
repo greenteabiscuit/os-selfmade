@@ -86,7 +86,7 @@ func main() {
 		}
 	}
 
-	// putBlock8_8(320, 16, 16, 100, 100, 16, mouse[:])
+	putBlock8_8(xsize, 16, 16, 100, 100, 16, mouse[:])
 
 	delay(10000)
 }
