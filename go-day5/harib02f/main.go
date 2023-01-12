@@ -49,26 +49,29 @@ func main() {
 	putfont8Asc(xsize, 11, 11, WHITE, []byte(variable))
 	putfont8Asc(xsize, 10, 10, BLACK, []byte(variable))
 
+	putfont8Asc(xsize, 10, 31, WHITE, []byte("scrnx = "))
+	putfont8Asc(xsize, 10, 30, BLACK, []byte("scrnx = "))
 	bs := convertIntToByteArray(xsize)
-	putfont8Asc(xsize, 101, 21, WHITE, bs[:])
-	putfont8Asc(xsize, 100, 20, BLACK, bs[:])
+	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
+	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
 	delay(10000)
 }
 
-func convertIntToByteArray(n int) [4]byte {
+// can only show til 10 digits for now.
+func convertIntToByteArray(n int) [10]byte {
 	t := n
 	count := 0
 	for n > 0 {
 		n = n / 10
 		count++
 	}
-	bs := [4]byte{}
+	bs := [10]byte{}
 
-	i := 0
+	i := count - 1
 	for t > 0 {
 		bs[i] = byte(t%10 + 48)
 		t = t / 10
-		i++
+		i--
 	}
 	return bs
 }
