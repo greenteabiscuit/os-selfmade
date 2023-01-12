@@ -44,15 +44,17 @@ func main() {
 	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, WHITE)
 	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, WHITE)
 
-	putfont8(xsize, 10, 10, WHITE, Letters[int('A')*16:])
-	putfont8(xsize, 20, 10, WHITE, Letters[int('B')*16:])
-	putfont8(xsize, 30, 10, WHITE, Letters[int('C')*16:])
-
-	putfont8(xsize, 50, 10, WHITE, Letters[int('1')*16:])
-	putfont8(xsize, 60, 10, WHITE, Letters[int('2')*16:])
-	putfont8(xsize, 70, 10, WHITE, Letters[int('3')*16:])
+	putfont8Asc(xsize, 11, 11, WHITE, []byte("Golang OS"))
+	putfont8Asc(xsize, 10, 10, BLACK, []byte("Golang OS"))
 
 	delay(10000)
+}
+
+func putfont8Asc(xsize, x, y int, color uint16, s []byte) {
+	for _, b := range s {
+		putfont8(xsize, x, y, color, Letters[int(b)*16:])
+		x += 8
+	}
 }
 
 func putfont8(xsize, x, y int, color uint16, font []byte) {
