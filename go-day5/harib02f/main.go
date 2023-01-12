@@ -54,7 +54,19 @@ func main() {
 	bs := convertIntToByteArray(xsize)
 	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
 	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
+
+	mouse := InitMouseCursor8(LIGHTBLUE)
+	putBlock8_8(320, 16, 16, 100, 100, 16, mouse[:])
+
 	delay(10000)
+}
+
+func putBlock8_8(vxsize, pxsize, pysize, px0, py0, bxsize int, buf []uint16) {
+	for y := 0; y < pysize; y++ {
+		for x := 0; x < pxsize; x++ {
+			*(*uint16)(unsafe.Pointer(fbPhysAddr + uintptr(py0+y)*uintptr(vxsize) + uintptr(px0+x))) = buf[y*bxsize+x]
+		}
+	}
 }
 
 // can only show til 10 digits for now.
