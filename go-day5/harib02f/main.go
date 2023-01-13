@@ -24,6 +24,8 @@ const (
 	WHITE       uint16  = 15
 )
 
+func add2(i int32) int32
+
 func main() {
 	delay(1000)
 	xsize, ysize := 320, 200
@@ -54,6 +56,15 @@ func main() {
 	bs := convertIntToByteArray(xsize)
 	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
 	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
+
+	res := add2(int32(100))
+
+	res += 1
+
+	resByte := convertIntToByteArray(int(res))
+
+	putfont8Asc(xsize, 101, 51, WHITE, resByte[:])
+	putfont8Asc(xsize, 100, 50, BLACK, resByte[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
