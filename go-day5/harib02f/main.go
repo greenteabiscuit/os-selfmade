@@ -24,7 +24,7 @@ const (
 	WHITE       uint16  = 15
 )
 
-func add2(i int32) int32
+func add2(i int16) int16
 
 func main() {
 	delay(1000)
@@ -57,7 +57,7 @@ func main() {
 	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
 	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
 
-	res := add2(int32(100))
+	res := add2(int16(100))
 
 	res += 1
 
