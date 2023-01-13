@@ -5,3 +5,4 @@
 *.hrb
 *.img
 *.sys.idea
+.idea/*
