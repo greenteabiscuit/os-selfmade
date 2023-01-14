@@ -39,13 +39,24 @@ TEXT ·load_idtr(SB),$0-0
     MOVL BX, ret+8(FP) // return address for debugging: if returning 0(AX) (as WORD), this should return 2048 - 1 = 2047
 	RET
 
+TEXT ·load_gdtr(SB),$0-0
+    MOVL $65535,0(AX)    // first arg to AX reg
+    MOVL i+4(FP),BX
+	MOVL BX, 2(AX)
+	MOVL (AX), GDTR 	// LIDT[RAX]
+	// MOVW 0(AX), AX
+	// MOVW AX, ret+8(FP) // return address for debugging: if returning 0(AX) (as WORD), this should return 2048 - 1 = 2047
+    MOVL BX, ret+8(FP) // return address for debugging: if returning 0(AX) (as WORD), this should return 2048 - 1 = 2047
+	RET
+
 TEXT ·io_sti(SB),$0-0
     STI
     RET
 
-TEXT ·PortWriteByte(SB),NOSPLIT,$0
+
+TEXT ·PortWrite8(SB),NOSPLIT,$0
 	MOVW port+0(FP), DX
-	MOVB val+2(FP), AX
+	MOVW val+2(FP), AX
 	BYTE $0xee // out al, dx
 	RET
 

@@ -7,6 +7,7 @@ import (
 const (
 	fbPhysAddr  uintptr = 0xa0000
 	IDTAddr     uintptr = 0x0026f800
+	GDTAddr     uintptr = 0x00270000
 	BLACK       uint16  = 0
 	BLUE        uint16  = 1
 	GREEN       uint16  = 2
@@ -25,6 +26,12 @@ const (
 	WHITE       uint16  = 15
 )
 
+type SegmentDescriptor struct {
+	LimitLow, BaseLow    uint16
+	BaseMid, AccessRight uint8
+	LimitHigh, BaseHigh  uint8
+}
+
 type GateDescriptor struct {
 	OffsetLow, Selector  uint16
 	DWCount, AccessRight uint8
@@ -38,6 +45,8 @@ func asmIntHandler2c()
 func asmIntHandler27()
 
 func load_idtr(uint32, uint32) uint32
+
+func load_gdtr(uint32, uint32) uint32
 
 func add(i int16, j int16) (int16, int16)
 
@@ -53,6 +62,44 @@ func main() {
 	f2c := asmIntHandler2c
 	f27 := asmIntHandler27
 
+	for i := 0; i < 8192; i++ {
+		switch i {
+		case 1:
+			base := 0
+			ar := 0x4092
+			*(*SegmentDescriptor)(unsafe.Pointer(GDTAddr + uintptr(i*8))) = *(&SegmentDescriptor{
+				LimitLow:    uint16(0xffffffff & 0xffff),
+				BaseLow:     uint16(base & 0xffff),
+				BaseMid:     uint8((base >> 16) & 0xff),
+				AccessRight: uint8(ar & 0xff),
+				LimitHigh:   uint8(((0xffffffff >> 16) & 0x0f) | ((ar >> 8) & 0xf0)),
+				BaseHigh:    uint8((base >> 24) & 0xff),
+			})
+		case 2:
+			limit := 0x0007ffff
+			base := 0x00280000
+			ar := 0x409a
+			*(*SegmentDescriptor)(unsafe.Pointer(GDTAddr + uintptr(i*8))) = *(&SegmentDescriptor{
+				LimitLow:    uint16(limit & 0xffff),
+				BaseLow:     uint16(base & 0xffff),
+				BaseMid:     uint8((base >> 16) & 0xff),
+				AccessRight: uint8(ar & 0xff),
+				LimitHigh:   uint8(((limit >> 16) & 0x0f) | ((ar >> 8) & 0xf0)),
+				BaseHigh:    uint8((base >> 24) & 0xff),
+			})
+		default:
+			*(*SegmentDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&SegmentDescriptor{
+				LimitLow:    0,
+				BaseLow:     0,
+				BaseMid:     0,
+				AccessRight: 0,
+				LimitHigh:   0,
+				BaseHigh:    0,
+			})
+		}
+	}
+	size := load_gdtr(0xFFFF, uint32(GDTAddr))
+
 	for i := 0; i < 256; i++ {
 		*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
 			OffsetLow:   0,
@@ -63,7 +110,7 @@ func main() {
 		})
 	}
 
-	size := load_idtr(0x7FF, uint32(IDTAddr))
+	_ = load_idtr(0x7FF, uint32(IDTAddr))
 	// _ = InitIDT()
 	InitPIC()
 	io_sti()
@@ -146,8 +193,8 @@ func main() {
 	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
 	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
 
-	PortWriteByte(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001)
-	PortWriteByte(PIC1_IMR, 0xef) // Allow mouse (11101111)
+	PortWrite8(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001)
+	PortWrite8(PIC1_IMR, 0xef) // Allow mouse (11101111)
 
 	// idtAddr := GetIDTAddr()
 
@@ -156,9 +203,10 @@ func main() {
 	putfont8Asc(xsize, 250, 71, WHITE, idtAddrByte[:])
 	putfont8Asc(xsize, 250, 70, BLACK, idtAddrByte[:])
 
-	size++
-	g := *(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8)))
-	sizeByte := convertIntToByteArray(int(g.Selector))
+	// size++
+	_ = *(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8)))
+
+	sizeByte := convertIntToByteArray(int(size))
 
 	putfont8Asc(xsize, 250, 91, WHITE, sizeByte[:])
 	putfont8Asc(xsize, 250, 90, BLACK, sizeByte[:])
