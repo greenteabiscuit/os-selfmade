@@ -75,8 +75,8 @@ func main() {
 
 	idtbyte := convertIntToByteArray(int(idt))
 
-	putfont8Asc(xsize, 270, 51, WHITE, idtbyte[:])
-	putfont8Asc(xsize, 270, 50, BLACK, idtbyte[:])
+	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
+	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
@@ -123,14 +123,14 @@ func putBlock8_8(vxsize, pxsize, pysize, px0, py0, bxsize int, buf []uint16) {
 }
 
 // can only show til 10 digits for now.
-func convertIntToByteArray(n int) [10]byte {
+func convertIntToByteArray(n int) [20]byte {
 	t := n
 	count := 0
 	for n > 0 {
 		n = n / 10
 		count++
 	}
-	bs := [10]byte{}
+	bs := [20]byte{}
 
 	i := count - 1
 	if t < 0 {

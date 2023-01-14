@@ -25,14 +25,14 @@ GLOBL ·gateHandlers<>(SB), NOPTR, $NUM_IDT_ENTRIES*8
 // installIDT populates idtDescriptor with the address of IDT and loads it to
 // the CPU. All gate entries are initially marked as non-present and must be
 // explicitly enabled by invoking HandleInterrupt.
-TEXT ·installIDT(SB),NOSPLIT,$4
+TEXT ·installIDT(SB),NOSPLIT,$0
 	LEAL ·idtDescriptor<>(SB), AX
 	MOVW $(NUM_IDT_ENTRIES*IDT_ENTRY_SIZE)-1, 0(AX)
 	LEAL ·idt<>(SB), BX
 	MOVL BX, 2(AX)
-	MOVL 0(AX), IDTR 	// LIDT[RAX]
-	MOVB 0(AX), AX
-	MOVB AX, ret+0(FP) // 2番目の戻り値として返す
+	MOVL (AX), IDTR 	// LIDT[RAX]
+	// MOVB 0(AX), AX
+	MOVL AX, ret+0(FP) // 1番目の戻り値として返す
 	RET
 
 TEXT ·asmIntHandler21(SB),$0-0

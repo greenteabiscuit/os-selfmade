@@ -1,10 +1,10 @@
 package main
 
-func installIDT() int16
+func installIDT() int32
 
 // InitIDT runs the appropriate CPU-specific initialization code for enabling
 // support for interrupt handling.
-func InitIDT() int16 {
+func InitIDT() int32 {
 	return installIDT()
 }
 
