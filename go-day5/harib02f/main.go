@@ -47,14 +47,6 @@ func main() {
 	delay(1000)
 	f := asmIntHandler21
 
-	*(*GateDescriptor)(unsafe.Pointer(IDTAddr)) = *(&GateDescriptor{
-		OffsetLow:   0,
-		Selector:    0,
-		DWCount:     0,
-		AccessRight: 0,
-		OffsetHigh:  0,
-	})
-
 	for i := 0; i < 256; i++ {
 		*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
 			OffsetLow:   0,
@@ -65,7 +57,7 @@ func main() {
 		})
 	}
 
-	size := load_idtr(0x7FF, 0x1987A0)
+	size := load_idtr(0x7FF, uint32(IDTAddr))
 	// _ = InitIDT()
 	InitPIC()
 	io_sti()
