@@ -20,6 +20,6 @@ func IntHandler2c() {
 }
 
 func IntHandler27() {
-	boxFill8(320, 0, 0, 32*8-1, 15, BLACK)
+	PortWriteByte(PIC0_OCW2, 0x67)
 	delay(1000)
 }

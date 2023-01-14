@@ -137,9 +137,9 @@ TEXT ·asmIntHandler2c(SB),$0-0
 
     IRETL
 
-TEXT ·GetIDTAddr(SB),$0-0
-    LEAL ·idt<>+0(SB), DI
-    MOVL DI, AX
+TEXT ·GetGDTR(SB),$0-0
+    MOVL GDTR, (AX)
+    MOVL 2(AX), AX
     MOVL AX, ret+0(FP)
     RET
 

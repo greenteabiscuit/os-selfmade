@@ -53,6 +53,11 @@ TEXT ·io_sti(SB),$0-0
     STI
     RET
 
+TEXT ·PortWriteByte(SB),NOSPLIT,$0
+	MOVW port+0(FP), DX
+	MOVB val+2(FP), AX
+	BYTE $0xee // out al, dx
+	RET
 
 TEXT ·PortWrite8(SB),NOSPLIT,$0
 	MOVW port+0(FP), DX

@@ -50,7 +50,7 @@ func load_gdtr(uint32, uint32) uint32
 
 func add(i int16, j int16) (int16, int16)
 
-func GetIDTAddr() int32
+func GetGDTR() int32
 
 func io_sti()
 
@@ -58,6 +58,7 @@ func io_sti()
 
 func main() {
 	delay(1000)
+	idtAddr := GetGDTR()
 	f21 := asmIntHandler21
 	f2c := asmIntHandler2c
 	f27 := asmIntHandler27
@@ -65,14 +66,15 @@ func main() {
 	for i := 0; i < 8192; i++ {
 		switch i {
 		case 1:
+			ar := 0x4092 | 0x8000
+			limit := 0xffffffff / 0x1000
 			base := 0
-			ar := 0x4092
 			*(*SegmentDescriptor)(unsafe.Pointer(GDTAddr + uintptr(i*8))) = *(&SegmentDescriptor{
-				LimitLow:    uint16(0xffffffff & 0xffff),
+				LimitLow:    uint16(limit & 0xffff),
 				BaseLow:     uint16(base & 0xffff),
 				BaseMid:     uint8((base >> 16) & 0xff),
 				AccessRight: uint8(ar & 0xff),
-				LimitHigh:   uint8(((0xffffffff >> 16) & 0x0f) | ((ar >> 8) & 0xf0)),
+				LimitHigh:   uint8(((limit >> 16) & 0x0f) | ((ar >> 8) & 0xf0)),
 				BaseHigh:    uint8((base >> 24) & 0xff),
 			})
 		case 2:
@@ -98,7 +100,7 @@ func main() {
 			})
 		}
 	}
-	size := load_gdtr(0xFFFF, uint32(GDTAddr))
+	gdtrsize := load_gdtr(0xFFFF, uint32(GDTAddr))
 
 	for i := 0; i < 256; i++ {
 		*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
@@ -165,7 +167,7 @@ func main() {
 	boxFill8(xsize, xsize-47, ysize-3, xsize-4, ysize-3, WHITE)
 	boxFill8(xsize, xsize-3, ysize-24, xsize-3, ysize-3, WHITE)
 
-	variable := "Golang OS 1"
+	variable := "Golang OS"
 
 	putfont8Asc(xsize, 11, 11, WHITE, []byte(variable))
 	putfont8Asc(xsize, 10, 10, BLACK, []byte(variable))
@@ -193,21 +195,23 @@ func main() {
 	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
 	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
 
-	PortWrite8(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001)
-	PortWrite8(PIC1_IMR, 0xef) // Allow mouse (11101111)
+	PortWriteByte(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001)
+	PortWriteByte(PIC1_IMR, 0xef) // Allow mouse (11101111)
 
-	// idtAddr := GetIDTAddr()
+	idtAddrByte := convertIntToByteArray(int(idtAddr))
 
-	idtAddrByte := convertIntToByteArray(int(IDTAddr))
-
+	putfont8Asc(xsize, 180, 71, WHITE, []byte("gdtraddr"))
+	putfont8Asc(xsize, 180, 70, BLACK, []byte("gdtraddr:"))
 	putfont8Asc(xsize, 250, 71, WHITE, idtAddrByte[:])
 	putfont8Asc(xsize, 250, 70, BLACK, idtAddrByte[:])
 
 	// size++
 	_ = *(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8)))
 
-	sizeByte := convertIntToByteArray(int(size))
+	sizeByte := convertIntToByteArray(int(gdtrsize))
 
+	putfont8Asc(xsize, 180, 91, WHITE, []byte("gdtrsize"))
+	putfont8Asc(xsize, 180, 90, BLACK, []byte("gdtrsize:"))
 	putfont8Asc(xsize, 250, 91, WHITE, sizeByte[:])
 	putfont8Asc(xsize, 250, 90, BLACK, sizeByte[:])
 
