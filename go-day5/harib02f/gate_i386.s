@@ -36,8 +36,11 @@ TEXT ·installIDT(SB),NOSPLIT,$0
 	LEAL ·idt<>(SB), BX
 	MOVL BX, 2(AX)
 	MOVL (AX), IDTR 	// LIDT[RAX]
-	MOVW 0(AX), AX
-	MOVW AX, ret+0(FP) // return address for debugging: if returning 0(AX) (as WORD), this should return 2048 - 1 = 2047
+	MOVL 2(AX), AX
+	MOVL AX, ret+0(FP) // return address for debugging: if returning 0(AX) (as WORD), this should return 2048 - 1 = 2047
+	// if returning address, use below:
+	// MOVL 2(AX), AX
+	// MOVL AX, ret+0(FP)
 	RET
 
 TEXT ·asmIntHandler21(SB),$0-0
@@ -54,11 +57,19 @@ TEXT ·asmIntHandler21(SB),$0-0
 
 	IRETL
 
+TEXT ·GetIDTAddr(SB),$0-0
+    LEAL ·idt<>+0(SB), DI
+    MOVL DI, AX
+    MOVL AX, ret+0(FP)
+    RET
+
 // HandleInterrupt ensures that the provided handler will be invoked when a
 // particular interrupt number occurs. The value of the istOffset argument
 // specifies the offset in the interrupt stack table (if 0 then IST is not
 // used).
 TEXT ·HandleInterrupt(SB),NOSPLIT,$0-10
+    MOVL $21, CX
+
 	// Dereference pointer to trap handler and copy it into gateHandlers
 	MOVL handler+0(FP), BX
 	MOVL 0(BX), BX
@@ -89,6 +100,14 @@ update_idt_entry:
 	// Mark entry as non-present while updating the handler address
 	MOVB $0, 5(DI)
 
-	MOVW $0x10, 2(DI) // selector
+	MOVW $16, 2(DI) // selector
+
+    // Copy the entrypoint address from SI
+    MOVW SI, 0(DI)
+    SHRL $16, SI
+    MOVW SI, 6(DI)
+
     // Mark entry as a present, 32-bit interrupt gate
     MOVB $ENTRY_TYPE_INTERRUPT_GATE, 5(DI) // gd->access_right = ar & 0xff
+
+    RET

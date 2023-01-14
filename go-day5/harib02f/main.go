@@ -26,11 +26,16 @@ const (
 
 func add(i int16, j int16) (int16, int16)
 
+func GetIDTAddr() int32
+
+// func HandleInterrupt(f func())
+
 func main() {
 	delay(1000)
 
 	idt := InitIDT()
 	InitPIC()
+	// HandleInterrupt(IntHandler21)
 
 	xsize, ysize := 320, 200
 	boxFill8(xsize, 0, 0, xsize-1, ysize-29, LIGHTBLUE)
@@ -77,6 +82,13 @@ func main() {
 
 	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
 	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
+
+	idtAddr := GetIDTAddr()
+
+	idtAddrByte := convertIntToByteArray(int(idtAddr))
+
+	putfont8Asc(xsize, 250, 71, WHITE, idtAddrByte[:])
+	putfont8Asc(xsize, 250, 70, BLACK, idtAddrByte[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
