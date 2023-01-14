@@ -137,10 +137,16 @@ TEXT ·asmIntHandler2c(SB),$0-0
 
     IRETL
 
-TEXT ·GetGDTR(SB),$0-0
+TEXT ·GetGDTRAddress(SB),$0-0
     MOVL GDTR, (AX)
     MOVL 2(AX), AX
     MOVL AX, ret+0(FP)
+    RET
+
+TEXT ·GetGDTRSize(SB),$0-0
+    MOVL GDTR, (AX)
+    MOVW 0(AX), AX
+    MOVW AX, ret+0(FP)
     RET
 
 // HandleInterrupt ensures that the provided handler will be invoked when a

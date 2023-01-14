@@ -7,7 +7,7 @@ import (
 const (
 	fbPhysAddr  uintptr = 0xa0000
 	IDTAddr     uintptr = 0x0026f800
-	GDTAddr     uintptr = 0x00270000
+	GDTAddr     uintptr = 0x101100
 	BLACK       uint16  = 0
 	BLUE        uint16  = 1
 	GREEN       uint16  = 2
@@ -50,7 +50,9 @@ func load_gdtr(uint32, uint32) uint32
 
 func add(i int16, j int16) (int16, int16)
 
-func GetGDTR() int32
+func GetGDTRAddress() int32
+
+func GetGDTRSize() int32
 
 func io_sti()
 
@@ -58,7 +60,7 @@ func io_sti()
 
 func main() {
 	delay(1000)
-	idtAddr := GetGDTR()
+	idtAddr := GetGDTRAddress()
 	f21 := asmIntHandler21
 	f2c := asmIntHandler2c
 	f27 := asmIntHandler27
@@ -100,7 +102,8 @@ func main() {
 			})
 		}
 	}
-	gdtrsize := load_gdtr(0xFFFF, uint32(GDTAddr))
+	// gdtrsize := load_gdtr(0xFFFF, uint32(GDTAddr))
+	gdtrsize := GetGDTRSize()
 
 	for i := 0; i < 256; i++ {
 		*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
