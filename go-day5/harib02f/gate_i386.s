@@ -61,6 +61,38 @@ TEXT ·asmIntHandler21(SB),$0-0
 
 	IRETL
 
+TEXT ·asmIntHandler27(SB),$0-0
+    SUBL $20, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
+    MOVB BP, 8(SP) // 現在のBPレジスタをpush
+    MOVW ES, 12(SP)
+    MOVW DS, 16(SP)
+    LEAL 8(SP), BP // BPレジスタを新しいスタックに更新
+    MOVB AX, (SP)   // 最初の引数iを渡す
+    CALL ·IntHandler27(SB)
+    MOVB 4(SP), AX  // main.negの戻り値をAXレジスタに取り出す
+    MOVB 8(SP), BP // 退避していたBPレジスタをpop
+    MOVW 12(SP), ES
+    MOVW 16(SP), DS
+    ADDL $20, SP    // スタックサイズを戻す
+
+    IRETL
+
+TEXT ·asmIntHandler2c(SB),$0-0
+    SUBL $20, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
+    MOVB BP, 8(SP) // 現在のBPレジスタをpush
+    MOVW ES, 12(SP)
+    MOVW DS, 16(SP)
+    LEAL 8(SP), BP // BPレジスタを新しいスタックに更新
+    MOVB AX, (SP)   // 最初の引数iを渡す
+    CALL ·IntHandler2c(SB)
+    MOVB 4(SP), AX  // main.negの戻り値をAXレジスタに取り出す
+    MOVB 8(SP), BP // 退避していたBPレジスタをpop
+    MOVW 12(SP), ES
+    MOVW 16(SP), DS
+    ADDL $20, SP    // スタックサイズを戻す
+
+    IRETL
+
 TEXT ·GetIDTAddr(SB),$0-0
     LEAL ·idt<>+0(SB), DI
     MOVL DI, AX

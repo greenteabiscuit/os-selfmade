@@ -12,3 +12,13 @@ func IntHandler21() {
 	boxFill8(320, 0, 0, 32*8-1, 15, BLACK)
 	delay(1000)
 }
+
+func IntHandler2c() {
+	boxFill8(320, 0, 0, 32*8-1, 15, BLACK)
+	delay(1000)
+}
+
+func IntHandler27() {
+	boxFill8(320, 0, 0, 32*8-1, 15, BLACK)
+	delay(1000)
+}

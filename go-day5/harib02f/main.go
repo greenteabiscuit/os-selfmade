@@ -33,6 +33,10 @@ type GateDescriptor struct {
 
 func asmIntHandler21()
 
+func asmIntHandler2c()
+
+func asmIntHandler27()
+
 func load_idtr(uint32, uint32) uint32
 
 func add(i int16, j int16) (int16, int16)
@@ -45,7 +49,9 @@ func io_sti()
 
 func main() {
 	delay(1000)
-	f := asmIntHandler21
+	f21 := asmIntHandler21
+	f2c := asmIntHandler2c
+	f27 := asmIntHandler27
 
 	for i := 0; i < 256; i++ {
 		*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
@@ -65,11 +71,29 @@ func main() {
 	for i := 0; i < 256; i++ {
 		if i == 0x21 {
 			*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
-				OffsetLow:   uint16(uintptr(unsafe.Pointer(&f)) & 0xffff),
+				OffsetLow:   uint16(uintptr(unsafe.Pointer(&f21)) & 0xffff),
 				Selector:    2 * 8,
 				DWCount:     uint8((0x8e >> 8) & 0xff),
 				AccessRight: uint8(0x8e & 0xff),
-				OffsetHigh:  uint16((uintptr(unsafe.Pointer(&f)) >> 16) & 0xffff),
+				OffsetHigh:  uint16((uintptr(unsafe.Pointer(&f21)) >> 16) & 0xffff),
+			})
+		}
+		if i == 0x2c {
+			*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
+				OffsetLow:   uint16(uintptr(unsafe.Pointer(&f2c)) & 0xffff),
+				Selector:    2 * 8,
+				DWCount:     uint8((0x8e >> 8) & 0xff),
+				AccessRight: uint8(0x8e & 0xff),
+				OffsetHigh:  uint16((uintptr(unsafe.Pointer(&f2c)) >> 16) & 0xffff),
+			})
+		}
+		if i == 0x27 {
+			*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
+				OffsetLow:   uint16(uintptr(unsafe.Pointer(&f27)) & 0xffff),
+				Selector:    2 * 8,
+				DWCount:     uint8((0x8e >> 8) & 0xff),
+				AccessRight: uint8(0x8e & 0xff),
+				OffsetHigh:  uint16((uintptr(unsafe.Pointer(&f27)) >> 16) & 0xffff),
 			})
 		}
 	}
