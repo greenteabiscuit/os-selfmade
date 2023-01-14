@@ -1,3 +1,5 @@
+#include "textflag.h"
+
 TEXT ·add(SB),$24-16
     MOVB i+0(FP),AX    // first arg to AX reg
     MOVB i+2(FP),BX
@@ -15,3 +17,15 @@ TEXT ·add(SB),$24-16
     ADDL $12, SP    // スタックサイズを戻す
     MOVB AX, ret2+6(FP) // 2番目の戻り値として返す
     RET
+
+TEXT ·PortWriteByte(SB),NOSPLIT,$0
+	MOVW port+0(FP), DX
+	MOVB val+2(FP), AX
+	BYTE $0xee // out al, dx
+	RET
+
+TEXT ·PortReadByte(SB),NOSPLIT,$0
+	MOVW port+0(FP), DX
+	BYTE $0xec  // in al, dx
+	MOVB AX, ret+0(FP)
+	RET

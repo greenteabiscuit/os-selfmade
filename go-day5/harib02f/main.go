@@ -28,6 +28,9 @@ func add(i int16, j int16) (int16, int16)
 
 func main() {
 	delay(1000)
+
+	InitPIC()
+
 	xsize, ysize := 320, 200
 	boxFill8(xsize, 0, 0, xsize-1, ysize-29, LIGHTBLUE)
 	boxFill8(xsize, 0, ysize-28, xsize-1, ysize-28, LIGHTGRAY)
