@@ -36,8 +36,8 @@ TEXT ·installIDT(SB),NOSPLIT,$0
 	LEAL ·idt<>(SB), BX
 	MOVL BX, 2(AX)
 	MOVL (AX), IDTR 	// LIDT[RAX]
-	MOVB 1(AX), AX
-	MOVL AX, ret+0(FP) // return address for debugging
+	MOVW 0(AX), AX
+	MOVW AX, ret+0(FP) // return address for debugging: if returning 0(AX), this should return 2048 - 1 = 2047
 	RET
 
 TEXT ·asmIntHandler21(SB),$0-0
