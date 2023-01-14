@@ -6,6 +6,7 @@ import (
 
 const (
 	fbPhysAddr  uintptr = 0xa0000
+	IDTAddr     uintptr = 0x1987A0
 	BLACK       uint16  = 0
 	BLUE        uint16  = 1
 	GREEN       uint16  = 2
@@ -24,6 +25,14 @@ const (
 	WHITE       uint16  = 15
 )
 
+type GateDescriptor struct {
+	OffsetLow, Selector  uint16
+	DWCount, AccessRight uint8
+	OffsetHigh           uint16
+}
+
+func load_idtr(uint32, uint32) uint32
+
 func add(i int16, j int16) (int16, int16)
 
 func GetIDTAddr() int32
@@ -33,7 +42,26 @@ func GetIDTAddr() int32
 func main() {
 	delay(1000)
 
-	idt := InitIDT()
+	*(*GateDescriptor)(unsafe.Pointer(IDTAddr)) = *(&GateDescriptor{
+		OffsetLow:   0,
+		Selector:    0,
+		DWCount:     0,
+		AccessRight: 0,
+		OffsetHigh:  0,
+	})
+
+	for i := 0; i < 256; i++ {
+		*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
+			OffsetLow:   0,
+			Selector:    0,
+			DWCount:     0,
+			AccessRight: 0,
+			OffsetHigh:  0,
+		})
+	}
+
+	size := load_idtr(0x7FF, 0x1987A0)
+	// _ = InitIDT()
 	InitPIC()
 	// HandleInterrupt(IntHandler21)
 
@@ -78,17 +106,22 @@ func main() {
 	putfont8Asc(xsize, 200, 51, WHITE, resByte2[:])
 	putfont8Asc(xsize, 200, 50, BLACK, resByte2[:])
 
-	idtbyte := convertIntToByteArray(int(idt))
+	idtbyte := convertIntToByteArray(int(InitIDT()) + 8)
 
 	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
 	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
 
-	idtAddr := GetIDTAddr()
+	// idtAddr := GetIDTAddr()
 
-	idtAddrByte := convertIntToByteArray(int(idtAddr))
+	idtAddrByte := convertIntToByteArray(int(IDTAddr))
 
 	putfont8Asc(xsize, 250, 71, WHITE, idtAddrByte[:])
 	putfont8Asc(xsize, 250, 70, BLACK, idtAddrByte[:])
+
+	sizeByte := convertIntToByteArray(int(size))
+
+	putfont8Asc(xsize, 250, 91, WHITE, sizeByte[:])
+	putfont8Asc(xsize, 250, 90, BLACK, sizeByte[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
@@ -155,6 +188,33 @@ func convertIntToByteArray(n int) [20]byte {
 		t = t / 10
 		i--
 	}
+	return bs
+}
+
+// can only show til 10 digits for now.
+func convertIntToHexByteArray(n int) [20]byte {
+	t := n
+	count := 0
+	for n > 0 {
+		n = n / 16
+		count++
+	}
+	bs := [20]byte{}
+
+	i := count + 2
+	if t < 0 {
+		i = count
+		bs[i] = '-'
+	}
+
+	for t > 0 {
+		bs[i] = byte(t%10 + 48)
+		t = t / 16
+		i--
+	}
+	bs[i] = 'x'
+	i--
+	bs[i] = '0'
 	return bs
 }
 

@@ -111,3 +111,70 @@ update_idt_entry:
     MOVB $ENTRY_TYPE_INTERRUPT_GATE, 5(DI) // gd->access_right = ar & 0xff
 
     RET
+
+// Emit interrupt dispatching code for traps where the CPU pushes an exception
+// code to the stack. The code below just pushes the handler's address to the
+// stack and jumps to dispatchInterrupt.
+//
+// This code uses some tricks to bypass Go assembler limitations:
+// - replace PUSH with: SUBQ $8, RSP; MOVQ X, 0(RSP). This prevents the Go
+//   assembler from complaining about unbalanced PUSH/POP statements.
+// - use a PUSH/RET (0xc3 byte instead of RET mnemonic) trick instead of a
+//   "JMP dispatchInterrupt" to prevent the optimizer from optimizing away all
+//   but the first entry in interruptGateEntries.
+//
+// Finally, each entry block ends with a series of 4 NOP instructions. This
+// delimiter is used by the HandleInterrupt implementation to locate the correct
+// entrypoint address for a particular interrupt.
+#define INT_ENTRY_WITH_CODE(num)
+
+// Emit interrupt dispatching code for traps where the CPU does not push an
+// exception code to the stack. The implementation is identical with the
+// INT_ENTRY_WITH_CODE above with the exception that the interrupt number is
+// manually pushed to the stack before the handler address so both entry
+// variants can use the same dispatching code.
+#define INT_ENTRY_WITHOUT_CODE(num) \
+	SUBL $24, SP;                          \
+	MOVL BX, 0(SP);                       \
+	MOVL ·gateHandlers<>+4*num(SB), BX;   \
+    MOVL BX, 4(SP);                       \
+    MOVL $num, 8(SP);                     \
+    LEAL ·dispatchInterrupt(SB), BX;      \
+    XCHGL BX, 0(SP);                      \
+    JMP ·dispatchInterrupt(SB);                            \
+    BYTE $0x90; BYTE $0x90;
+
+// dispatchInterrupt is invoked by the interrupt gate entrypoints to route 
+// an incoming interrupt to the selected handler.
+//
+// Callers MUST ensure that the stack has the following layout before calling 
+// dispatchInterrupt:
+//
+// |-----------------| <=== SP after jumping to dispatchInterrupt
+// | handler address | <- pushed by the interrupt entry code
+// |-----------------|
+// | exception code  | <- pushed by CPU or a dummy code pushed by the gate entry
+// |-----------------|
+// | RIP             | <- pushed by CPU (exception frame)
+// | CS              |
+// | RFLAGS          |
+// | RSP             |
+// | SS              |
+// |-----------------|
+//
+// Once the handler returns, the GP regs are restored and the stack is unwinded
+// so that the CPU can resume excecution of the code that triggered the
+// interrupt.
+//
+// Interrupts are automatically disabled by the CPU upon entry and re-enabled
+// when this function returns.
+//--------------------------- -----------------------------------------
+TEXT ·dispatchInterrupt(SB),$0-0
+	IRETL
+
+// interruptGateEntries contains a list of generated entries for each possible
+// interrupt number. Depending on the
+TEXT ·interruptGateEntries(SB),NOSPLIT,$0
+	// For a list of gate numbers that push an error code see: http://wiki.osdev.org/Exceptions
+	INT_ENTRY_WITHOUT_CODE(0)
+    RET
