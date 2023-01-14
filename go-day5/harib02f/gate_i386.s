@@ -7,15 +7,20 @@
 
 #define IDT_ENTRY_SIZE_SHIFT 4
 
-// The 64-bit SIDT consists of 10 bytes and has the following layout:
+// The 32-bit SIDT consists of 6 bytes and has the following layout:
 //   BYTE
 // [00 - 01] size of IDT minus 1
-// [02 - 09] address of the IDT
+// [02 - 05] address of the IDT, for 32-bit mode
 GLOBL ·idtDescriptor<>(SB), NOPTR, $10
 
 // The 32-bit IDT consists of NUM_IDT_ENTRIES slots containing 16-byte entries
-// with the following layout: TODO
-//   BYTE
+// with the following layout:
+	// [00-01] bits 0-15 of 32-bit handler address
+	// [02-03] CS selector
+	// [04-04] RESERVED, DW_COUNT
+	// [05-05] gate type/attributes, ACCESS_RIGHT
+	// [06-07] bits 16-31 of 32-bit handler address
+	//-------------------------
 GLOBL ·idt<>(SB), NOPTR, $NUM_IDT_ENTRIES*IDT_ENTRY_SIZE
 
 // A list of 256 function pointers for installed gate handlers. These pointers
@@ -31,8 +36,8 @@ TEXT ·installIDT(SB),NOSPLIT,$0
 	LEAL ·idt<>(SB), BX
 	MOVL BX, 2(AX)
 	MOVL (AX), IDTR 	// LIDT[RAX]
-	// MOVB 0(AX), AX
-	MOVL AX, ret+0(FP) // 1番目の戻り値として返す
+	MOVB 1(AX), AX
+	MOVL AX, ret+0(FP) // return address for debugging
 	RET
 
 TEXT ·asmIntHandler21(SB),$0-0
