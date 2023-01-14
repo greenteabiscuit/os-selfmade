@@ -79,7 +79,7 @@ TEXT ·asmIntHandler21(SB),$64-0
     MOVW 60(SP), GS
     ADDL $64, SP    // スタックサイズを戻す
 
-	RET
+	IRETL
 
 TEXT ·asmIntHandler27(SB),$0-0
     SUBL $44, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
@@ -107,7 +107,7 @@ TEXT ·asmIntHandler27(SB),$0-0
     MOVW 40(SP), SI
     ADDL $44, SP    // スタックサイズを戻す
 
-    RET
+    IRETL
 
 TEXT ·asmIntHandler2c(SB),$0-0
     SUBL $44, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
@@ -135,7 +135,7 @@ TEXT ·asmIntHandler2c(SB),$0-0
     MOVW 40(SP), SI
     ADDL $44, SP    // スタックサイズを戻す
 
-    RET
+    IRETL
 
 TEXT ·GetIDTAddr(SB),$0-0
     LEAL ·idt<>+0(SB), DI
