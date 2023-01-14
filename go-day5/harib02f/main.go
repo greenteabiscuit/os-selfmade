@@ -31,6 +31,8 @@ type GateDescriptor struct {
 	OffsetHigh           uint16
 }
 
+func asmIntHandler21()
+
 func load_idtr(uint32, uint32) uint32
 
 func add(i int16, j int16) (int16, int16)
@@ -43,6 +45,7 @@ func io_sti()
 
 func main() {
 	delay(1000)
+	f := asmIntHandler21
 
 	*(*GateDescriptor)(unsafe.Pointer(IDTAddr)) = *(&GateDescriptor{
 		OffsetLow:   0,
@@ -66,7 +69,19 @@ func main() {
 	// _ = InitIDT()
 	InitPIC()
 	io_sti()
-	setGatedesc(*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8))), 0, 0, 0)
+
+	for i := 0; i < 256; i++ {
+		if i == 0x21 {
+			*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(i*8))) = *(&GateDescriptor{
+				OffsetLow:   uint16(uintptr(unsafe.Pointer(&f)) & 0xffff),
+				Selector:    2 * 8,
+				DWCount:     uint8((0x8e >> 8) & 0xff),
+				AccessRight: uint8(0x8e & 0xff),
+				OffsetHigh:  uint16((uintptr(unsafe.Pointer(&f)) >> 16) & 0xffff),
+			})
+		}
+	}
+	// setGatedesc(*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8))), unsafe.Pointer(&f), 2*8, 0x8e)
 	// HandleInterrupt(IntHandler21)
 
 	xsize, ysize := 320, 200
@@ -115,6 +130,9 @@ func main() {
 	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
 	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
 
+	PortWriteByte(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001)
+	PortWriteByte(PIC1_IMR, 0xef) // Allow mouse (11101111)
+
 	// idtAddr := GetIDTAddr()
 
 	idtAddrByte := convertIntToByteArray(int(IDTAddr))
@@ -122,7 +140,9 @@ func main() {
 	putfont8Asc(xsize, 250, 71, WHITE, idtAddrByte[:])
 	putfont8Asc(xsize, 250, 70, BLACK, idtAddrByte[:])
 
-	sizeByte := convertIntToByteArray(int(size))
+	size++
+	g := *(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8)))
+	sizeByte := convertIntToByteArray(int(g.Selector))
 
 	putfont8Asc(xsize, 250, 91, WHITE, sizeByte[:])
 	putfont8Asc(xsize, 250, 90, BLACK, sizeByte[:])
@@ -163,12 +183,12 @@ func main() {
 	delay(10000)
 }
 
-func setGatedesc(gd GateDescriptor, offset, selector, ar int) {
-	gd.OffsetLow = uint16(offset & 0xffff)
+func setGatedesc(gd GateDescriptor, offset unsafe.Pointer, selector, ar int) {
+	gd.OffsetLow = uint16(uintptr(offset) & 0xffff)
 	gd.Selector = uint16(selector)
 	gd.DWCount = uint8((ar >> 8) & 0xff)
 	gd.AccessRight = uint8(ar & 0xff)
-	gd.OffsetHigh = uint16((offset >> 16) & 0xffff)
+	gd.OffsetHigh = uint16((uintptr(offset) >> 16) & 0xffff)
 	return
 }
 
