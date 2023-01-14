@@ -5,6 +5,8 @@
 
 #define ENTRY_TYPE_INTERRUPT_GATE 0x8e
 
+#define IDT_ENTRY_SIZE_SHIFT 4
+
 // The 64-bit SIDT consists of 10 bytes and has the following layout:
 //   BYTE
 // [00 - 01] size of IDT minus 1
@@ -23,12 +25,14 @@ GLOBL ·gateHandlers<>(SB), NOPTR, $NUM_IDT_ENTRIES*8
 // installIDT populates idtDescriptor with the address of IDT and loads it to
 // the CPU. All gate entries are initially marked as non-present and must be
 // explicitly enabled by invoking HandleInterrupt.
-TEXT ·installIDT(SB),NOSPLIT,$0
+TEXT ·installIDT(SB),NOSPLIT,$4
 	LEAL ·idtDescriptor<>(SB), AX
 	MOVW $(NUM_IDT_ENTRIES*IDT_ENTRY_SIZE)-1, 0(AX)
 	LEAL ·idt<>(SB), BX
 	MOVL BX, 2(AX)
 	MOVL 0(AX), IDTR 	// LIDT[RAX]
+	MOVB 0(AX), AX
+	MOVB AX, ret+0(FP) // 2番目の戻り値として返す
 	RET
 
 TEXT ·asmIntHandler21(SB),$0-0
@@ -51,22 +55,22 @@ TEXT ·asmIntHandler21(SB),$0-0
 // used).
 TEXT ·HandleInterrupt(SB),NOSPLIT,$0-10
 	// Dereference pointer to trap handler and copy it into gateHandlers
-	MOVQ handler+0(FP), BX
-	MOVQ 0(BX), BX
-	LEAQ ·gateHandlers<>+0(SB), DI
-	MOVQ BX, (DI)(CX*8)
+	MOVL handler+0(FP), BX
+	MOVL 0(BX), BX
+	LEAL ·gateHandlers<>+0(SB), DI
+	MOVL BX, (DI)(CX*8)
 
 	// Calculate IDT entry address
-	LEAQ ·idt<>+0(SB), DI
-	MOVQ CX, BX
-	SHLQ $IDT_ENTRY_SIZE_SHIFT, BX
-	ADDQ BX, DI
+	LEAL ·idt<>+0(SB), DI
+	MOVL CX, BX
+	SHLL $IDT_ENTRY_SIZE_SHIFT, BX
+	ADDL BX, DI
 
 	// The trap gate entries have variable lengths depending on whether
 	// the CPU pushes an exception code or not. Each generated entry ends
 	// with a sequence of 4 NOPs (0x90). The code below uses this information
 	// to locate the correct entry point address.
-	LEAQ ·interruptGateEntries(SB), SI // SI points to entry for trap 0
+	LEAL ·interruptGateEntries(SB), SI // SI points to entry for trap 0
 update_idt_entry:
 	// IDT entry layout (bytes)
 	// ------------------------
@@ -76,3 +80,10 @@ update_idt_entry:
 	// [05-05] gate type/attributes, ACCESS_RIGHT
 	// [06-07] bits 16-31 of 32-bit handler address
 	//-------------------------
+
+	// Mark entry as non-present while updating the handler address
+	MOVB $0, 5(DI)
+
+	MOVW $0x10, 2(DI) // selector
+    // Mark entry as a present, 32-bit interrupt gate
+    MOVB $ENTRY_TYPE_INTERRUPT_GATE, 5(DI) // gd->access_right = ar & 0xff

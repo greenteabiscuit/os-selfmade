@@ -29,6 +29,7 @@ func add(i int16, j int16) (int16, int16)
 func main() {
 	delay(1000)
 
+	idt := InitIDT()
 	InitPIC()
 
 	xsize, ysize := 320, 200
@@ -71,6 +72,11 @@ func main() {
 
 	putfont8Asc(xsize, 200, 51, WHITE, resByte2[:])
 	putfont8Asc(xsize, 200, 50, BLACK, resByte2[:])
+
+	idtbyte := convertIntToByteArray(int(idt))
+
+	putfont8Asc(xsize, 270, 51, WHITE, idtbyte[:])
+	putfont8Asc(xsize, 270, 50, BLACK, idtbyte[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
