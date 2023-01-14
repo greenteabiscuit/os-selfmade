@@ -39,6 +39,9 @@ TEXT ·load_idtr(SB),$0-0
     MOVL BX, ret+8(FP) // return address for debugging: if returning 0(AX) (as WORD), this should return 2048 - 1 = 2047
 	RET
 
+TEXT ·io_sti(SB),$0-0
+    STI
+    RET
 
 TEXT ·PortWriteByte(SB),NOSPLIT,$0
 	MOVW port+0(FP), DX

@@ -37,6 +37,8 @@ func add(i int16, j int16) (int16, int16)
 
 func GetIDTAddr() int32
 
+func io_sti()
+
 // func HandleInterrupt(f func())
 
 func main() {
@@ -63,6 +65,8 @@ func main() {
 	size := load_idtr(0x7FF, 0x1987A0)
 	// _ = InitIDT()
 	InitPIC()
+	io_sti()
+	setGatedesc(*(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8))), 0, 0, 0)
 	// HandleInterrupt(IntHandler21)
 
 	xsize, ysize := 320, 200
@@ -157,6 +161,15 @@ func main() {
 	putBlock8_8(xsize, 16, 16, 100, 100, 16, mouse[:])
 
 	delay(10000)
+}
+
+func setGatedesc(gd GateDescriptor, offset, selector, ar int) {
+	gd.OffsetLow = uint16(offset & 0xffff)
+	gd.Selector = uint16(selector)
+	gd.DWCount = uint8((ar >> 8) & 0xff)
+	gd.AccessRight = uint8(ar & 0xff)
+	gd.OffsetHigh = uint16((offset >> 16) & 0xffff)
+	return
 }
 
 func putBlock8_8(vxsize, pxsize, pysize, px0, py0, bxsize int, buf []uint16) {
