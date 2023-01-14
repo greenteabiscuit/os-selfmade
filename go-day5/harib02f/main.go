@@ -81,7 +81,8 @@ func main() {
 			})
 		case 2:
 			limit := 0x0007ffff
-			base := 0x00280000
+			// base := 0x00280000
+			base := 0x00142e30
 			ar := 0x409a
 			*(*SegmentDescriptor)(unsafe.Pointer(GDTAddr + uintptr(i*8))) = *(&SegmentDescriptor{
 				LimitLow:    uint16(limit & 0xffff),
