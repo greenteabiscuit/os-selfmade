@@ -5,13 +5,13 @@ TEXT ·add(SB),$24-16
     ADDB BX, AX
     MOVB AX, ret1+4(FP) // 計算結果を戻り値として返す
 
-    SUBL $24, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
-    MOVB BP, 16(SP) // 現在のBPレジスタをpush
-    LEAL 16(SP), BP // BPレジスタを新しいスタックに更新
+    SUBL $12, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
+    MOVB BP, 8(SP) // 現在のBPレジスタをpush
+    LEAL 8(SP), BP // BPレジスタを新しいスタックに更新
     MOVB AX, (SP)   // 最初の引数iを渡す
     CALL ·sub(SB)   // main.negを呼ぶ
-    MOVB 8(SP), AX  // main.negの戻り値をAXレジスタに取り出す
-    MOVB 16(SP), BP // 退避していたBPレジスタをpop
-    ADDL $24, SP    // スタックサイズを戻す
+    MOVB 4(SP), AX  // main.negの戻り値をAXレジスタに取り出す
+    MOVB 8(SP), BP // 退避していたBPレジスタをpop
+    ADDL $12, SP    // スタックサイズを戻す
     MOVB AX, ret2+6(FP) // 2番目の戻り値として返す
     RET
