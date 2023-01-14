@@ -43,7 +43,7 @@ TEXT ·installIDT(SB),NOSPLIT,$0
 	// MOVL AX, ret+0(FP)
 	RET
 
-TEXT ·asmIntHandler21(SB),$48-0
+TEXT ·asmIntHandler21(SB),$64-0
 	// Save GP regs. The push order MUST match the field layout in the 
 	// Registers struct.
     SUBL $64, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
@@ -79,7 +79,7 @@ TEXT ·asmIntHandler21(SB),$48-0
     MOVW 60(SP), GS
     ADDL $64, SP    // スタックサイズを戻す
 
-	IRETW
+	RET
 
 TEXT ·asmIntHandler27(SB),$0-0
     SUBL $44, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
@@ -105,9 +105,9 @@ TEXT ·asmIntHandler27(SB),$0-0
     MOVW 32(SP), DX
     MOVW 36(SP), DI
     MOVW 40(SP), SI
-    ADDL $20, SP    // スタックサイズを戻す
+    ADDL $44, SP    // スタックサイズを戻す
 
-    IRETL
+    RET
 
 TEXT ·asmIntHandler2c(SB),$0-0
     SUBL $44, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
@@ -133,9 +133,9 @@ TEXT ·asmIntHandler2c(SB),$0-0
     MOVW 32(SP), DX
     MOVW 36(SP), DI
     MOVW 40(SP), SI
-    ADDL $20, SP    // スタックサイズを戻す
+    ADDL $44, SP    // スタックサイズを戻す
 
-    IRETL
+    RET
 
 TEXT ·GetIDTAddr(SB),$0-0
     LEAL ·idt<>+0(SB), DI
