@@ -44,3 +44,35 @@ TEXT ·asmIntHandler21(SB),$0-0
     ADDL $12, SP    // スタックサイズを戻す
 
 	IRETL
+
+// HandleInterrupt ensures that the provided handler will be invoked when a
+// particular interrupt number occurs. The value of the istOffset argument
+// specifies the offset in the interrupt stack table (if 0 then IST is not
+// used).
+TEXT ·HandleInterrupt(SB),NOSPLIT,$0-10
+	// Dereference pointer to trap handler and copy it into gateHandlers
+	MOVQ handler+0(FP), BX
+	MOVQ 0(BX), BX
+	LEAQ ·gateHandlers<>+0(SB), DI
+	MOVQ BX, (DI)(CX*8)
+
+	// Calculate IDT entry address
+	LEAQ ·idt<>+0(SB), DI
+	MOVQ CX, BX
+	SHLQ $IDT_ENTRY_SIZE_SHIFT, BX
+	ADDQ BX, DI
+
+	// The trap gate entries have variable lengths depending on whether
+	// the CPU pushes an exception code or not. Each generated entry ends
+	// with a sequence of 4 NOPs (0x90). The code below uses this information
+	// to locate the correct entry point address.
+	LEAQ ·interruptGateEntries(SB), SI // SI points to entry for trap 0
+update_idt_entry:
+	// IDT entry layout (bytes)
+	// ------------------------
+	// [00-01] bits 0-15 of 32-bit handler address
+	// [02-03] CS selector
+	// [04-04] RESERVED, DW_COUNT
+	// [05-05] gate type/attributes, ACCESS_RIGHT
+	// [06-07] bits 16-31 of 32-bit handler address
+	//-------------------------
