@@ -24,7 +24,7 @@ const (
 	WHITE       uint16  = 15
 )
 
-func add(i int16, j int16) int16
+func add(i int16, j int16) (int16, int16)
 
 func main() {
 	delay(1000)
@@ -57,12 +57,17 @@ func main() {
 	putfont8Asc(xsize, 101, 31, WHITE, bs[:])
 	putfont8Asc(xsize, 100, 30, BLACK, bs[:])
 
-	res := add(int16(102), int16(102))
+	res1, res2 := add(int16(102), int16(102))
 
-	resByte := convertIntToByteArray(int(res))
+	resByte1 := convertIntToByteArray(int(res1))
 
-	putfont8Asc(xsize, 101, 51, WHITE, resByte[:])
-	putfont8Asc(xsize, 100, 50, BLACK, resByte[:])
+	putfont8Asc(xsize, 101, 51, WHITE, resByte1[:])
+	putfont8Asc(xsize, 100, 50, BLACK, resByte1[:])
+
+	resByte2 := convertIntToByteArray(int(res2))
+
+	putfont8Asc(xsize, 200, 51, WHITE, resByte2[:])
+	putfont8Asc(xsize, 200, 50, BLACK, resByte2[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
