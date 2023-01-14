@@ -52,7 +52,7 @@ func add(i int16, j int16) (int16, int16)
 
 func GetGDTRAddress() int32
 
-func GetGDTRSize() int32
+func GetGDTRSize() int16
 
 func io_sti()
 
@@ -102,7 +102,9 @@ func main() {
 			})
 		}
 	}
+
 	// gdtrsize := load_gdtr(0xFFFF, uint32(GDTAddr))
+
 	gdtrsize := GetGDTRSize()
 
 	for i := 0; i < 256; i++ {
@@ -198,7 +200,7 @@ func main() {
 	putfont8Asc(xsize, 250, 51, WHITE, idtbyte[:])
 	putfont8Asc(xsize, 250, 50, BLACK, idtbyte[:])
 
-	PortWriteByte(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001)
+	PortWriteByte(PIC0_IMR, 0xf9) // Allow PIC1&keyboard (11111001), if this is commented out, nothing will happen
 	PortWriteByte(PIC1_IMR, 0xef) // Allow mouse (11101111)
 
 	idtAddrByte := convertIntToByteArray(int(idtAddr))
@@ -209,14 +211,21 @@ func main() {
 	putfont8Asc(xsize, 250, 70, BLACK, idtAddrByte[:])
 
 	// size++
-	_ = *(*GateDescriptor)(unsafe.Pointer(IDTAddr + uintptr(0x21*8)))
+	gdtr := (*SegmentDescriptor)(unsafe.Pointer(GDTAddr + 2*8))
 
-	sizeByte := convertIntToByteArray(int(gdtrsize))
+	sizeByte := convertIntToByteArray(int(gdtr.AccessRight))
 
-	putfont8Asc(xsize, 180, 91, WHITE, []byte("gdtrsize"))
-	putfont8Asc(xsize, 180, 90, BLACK, []byte("gdtrsize:"))
+	putfont8Asc(xsize, 180, 91, WHITE, []byte("ar: "))
+	putfont8Asc(xsize, 180, 90, BLACK, []byte("ar: "))
 	putfont8Asc(xsize, 250, 91, WHITE, sizeByte[:])
 	putfont8Asc(xsize, 250, 90, BLACK, sizeByte[:])
+
+	gdtrsizebyte := convertIntToByteArray(int(gdtrsize))
+
+	putfont8Asc(xsize, 180, 121, WHITE, []byte("gdtrsize: "))
+	putfont8Asc(xsize, 180, 120, BLACK, []byte("gdtrsize: "))
+	putfont8Asc(xsize, 250, 121, WHITE, gdtrsizebyte[:])
+	putfont8Asc(xsize, 250, 120, BLACK, gdtrsizebyte[:])
 
 	mouse := [256]uint16{}
 	cursor := "**************.." +
