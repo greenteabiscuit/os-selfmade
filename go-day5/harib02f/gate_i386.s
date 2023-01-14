@@ -43,29 +43,55 @@ TEXT ·installIDT(SB),NOSPLIT,$0
 	// MOVL AX, ret+0(FP)
 	RET
 
-TEXT ·asmIntHandler21(SB),$0-0
+TEXT ·asmIntHandler21(SB),$48-0
 	// Save GP regs. The push order MUST match the field layout in the 
 	// Registers struct.
-    SUBL $20, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
-    MOVB BP, 8(SP) // 現在のBPレジスタをpush
+    SUBL $64, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
+    MOVL BP, 8(SP) // 現在のBPレジスタをpush
     MOVW ES, 12(SP)
     MOVW DS, 16(SP)
+    MOVL AX, 20(SP)
+    MOVL BX, 24(SP)
+    MOVL CX, 28(SP)
+    MOVL DX, 32(SP)
+    MOVL DI, 36(SP)
+    MOVL SI, 40(SP)
+    MOVL SP, 44(SP)
+    MOVW SS, 48(SP)
+    MOVW CS, 52(SP)
+    MOVW FS, 56(SP)
+    MOVW GS, 60(SP)
     LEAL 8(SP), BP // BPレジスタを新しいスタックに更新
-    MOVB AX, (SP)   // 最初の引数iを渡す
     CALL ·IntHandler21(SB)
-    MOVB 4(SP), AX  // main.negの戻り値をAXレジスタに取り出す
-    MOVB 8(SP), BP // 退避していたBPレジスタをpop
+    MOVL 8(SP), BP // 退避していたBPレジスタをpop
     MOVW 12(SP), ES
     MOVW 16(SP), DS
-    ADDL $20, SP    // スタックサイズを戻す
+    MOVL 20(SP), AX
+    MOVL 24(SP), BX
+    MOVL 28(SP), CX
+    MOVL 32(SP), DX
+    MOVL 36(SP), DI
+    MOVL 40(SP), SI
+    MOVL 44(SP), SP
+    MOVW 48(SP), SS
+    MOVW 52(SP), CS
+    MOVW 56(SP), FS
+    MOVW 60(SP), GS
+    ADDL $64, SP    // スタックサイズを戻す
 
-	IRETL
+	IRETW
 
 TEXT ·asmIntHandler27(SB),$0-0
-    SUBL $20, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
+    SUBL $44, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
     MOVB BP, 8(SP) // 現在のBPレジスタをpush
     MOVW ES, 12(SP)
     MOVW DS, 16(SP)
+    MOVW AX, 20(SP)
+    MOVW BX, 24(SP)
+    MOVW CX, 28(SP)
+    MOVW DX, 32(SP)
+    MOVW DI, 36(SP)
+    MOVW SI, 40(SP)
     LEAL 8(SP), BP // BPレジスタを新しいスタックに更新
     MOVB AX, (SP)   // 最初の引数iを渡す
     CALL ·IntHandler27(SB)
@@ -73,15 +99,27 @@ TEXT ·asmIntHandler27(SB),$0-0
     MOVB 8(SP), BP // 退避していたBPレジスタをpop
     MOVW 12(SP), ES
     MOVW 16(SP), DS
+    MOVW 20(SP), AX
+    MOVW 24(SP), BX
+    MOVW 28(SP), CX
+    MOVW 32(SP), DX
+    MOVW 36(SP), DI
+    MOVW 40(SP), SI
     ADDL $20, SP    // スタックサイズを戻す
 
     IRETL
 
 TEXT ·asmIntHandler2c(SB),$0-0
-    SUBL $20, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
+    SUBL $44, SP    // neg関数の引数と戻り値サイズ+BPレジスタの退避先を確保
     MOVB BP, 8(SP) // 現在のBPレジスタをpush
     MOVW ES, 12(SP)
     MOVW DS, 16(SP)
+    MOVW AX, 20(SP)
+    MOVW BX, 24(SP)
+    MOVW CX, 28(SP)
+    MOVW DX, 32(SP)
+    MOVW DI, 36(SP)
+    MOVW SI, 40(SP)
     LEAL 8(SP), BP // BPレジスタを新しいスタックに更新
     MOVB AX, (SP)   // 最初の引数iを渡す
     CALL ·IntHandler2c(SB)
@@ -89,6 +127,12 @@ TEXT ·asmIntHandler2c(SB),$0-0
     MOVB 8(SP), BP // 退避していたBPレジスタをpop
     MOVW 12(SP), ES
     MOVW 16(SP), DS
+    MOVW 20(SP), AX
+    MOVW 24(SP), BX
+    MOVW 28(SP), CX
+    MOVW 32(SP), DX
+    MOVW 36(SP), DI
+    MOVW 40(SP), SI
     ADDL $20, SP    // スタックサイズを戻す
 
     IRETL

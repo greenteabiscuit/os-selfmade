@@ -9,6 +9,7 @@ func InitIDT() int32 {
 }
 
 func IntHandler21() {
+	delay(1000)
 	boxFill8(320, 0, 0, 32*8-1, 15, BLACK)
 	delay(1000)
 }

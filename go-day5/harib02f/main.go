@@ -6,7 +6,7 @@ import (
 
 const (
 	fbPhysAddr  uintptr = 0xa0000
-	IDTAddr     uintptr = 0x1987A0
+	IDTAddr     uintptr = 0x0026f800
 	BLACK       uint16  = 0
 	BLUE        uint16  = 1
 	GREEN       uint16  = 2
