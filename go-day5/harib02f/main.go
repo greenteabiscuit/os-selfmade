@@ -119,6 +119,11 @@ func convertIntToByteArray(n int) [10]byte {
 	bs := [10]byte{}
 
 	i := count - 1
+	if t < 0 {
+		i = count
+		bs[i] = '-'
+	}
+
 	for t > 0 {
 		bs[i] = byte(t%10 + 48)
 		t = t / 10
@@ -179,4 +184,8 @@ func delay(v int) {
 		for j := 0; j < v; j++ {
 		}
 	}
+}
+
+func sub(i int16) int16 {
+	return i - 20
 }
