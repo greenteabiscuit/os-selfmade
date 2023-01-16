@@ -72,7 +72,7 @@ _rt0_entry:
 
 	; jump into the go code
 	extern main.main
-	call main.main
+	call 0x142e30
 
 	; Main should never return; halt the CPU
 halt:

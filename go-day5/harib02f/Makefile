@@ -47,10 +47,15 @@ go.o:
 	@# build/go.o is a elf32 object file but all Go symbols are unexported. Our
 	@# asm entrypoint code needs to know the address to 'main.main' and 'runtime.g0'
 	@# so we use objcopy to globalize them
-	@echo "[objcopy] globalizing symbols {runtime.g0, main.main} in go.o"
+	@echo "[objcopy] globalizing symbols {runtime.g0, main.main, main.delay} in go.o"
 	@objcopy \
 		--globalize-symbol runtime.g0 \
 		--globalize-symbol main.main \
+		--globalize-symbol main.delay \
+		--globalize-symbol main.putBlock8_8 \
+		--globalize-symbol main.installIDT \
+		--globalize-symbol main.GetGDTRAddress \
+		--globalize-symbol main.boxFill8 \
 		 $(BUILD_DIR)/go.o $(BUILD_DIR)/go.o
 
 $(BUILD_DIR)/arch/$(ARCH)/asm/%.o: arch/$(ARCH)/asm/%.s
@@ -102,6 +107,10 @@ gdb: iso
 	    -ex 'target remote localhost:1234' \
 	    -ex 'layout asm' \
 	    -ex 'b _rt0_entry' \
+	    -ex 'b main.main' \
+	    -ex 'b main.installIDT' \
+	    -ex 'b main.GetGDTRAddress' \
+	    -ex 'b main.boxFill8' \
 	    -ex 'continue' \
 	    -ex 'disass'
 	@killall qemu-system-i386 || true
