@@ -116,5 +116,9 @@ gdb: iso
 	@killall qemu-system-i386 || true
 endif
 
+gdb-verbose: iso
+	qemu-system-i386 -cdrom $(iso_target) -d int -no-shutdown -no-reboot
+
+
 clean:
 	@test -d $(BUILD_DIR) && rm -rf $(BUILD_DIR) || true
